@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Open a Line — Aryan Aryan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--black:#0c0a08;--surface:#141210;--surface2:#1c1916;--border:rgba(255,220,120,0.08);--border-bright:rgba(255,220,120,0.22);--text:#f0e8d8;--text-secondary:#9a8f7a;--text-tertiary:#4a4338;--amber:#d4920a;--amber-bright:#f5a623;--green-bright:#6aaf7e;}
+    body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;min-height:100vh;}
+    .cursor{width:8px;height:8px;background:var(--amber-bright);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:screen;}
+    .cursor-ring{width:28px;height:28px;border:1px solid rgba(245,166,35,0.4);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .18s,height .18s;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:8000;opacity:.5;}
+    .page-header{padding:24px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(12,10,8,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;animation:fadeDown .5s ease both;}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text-tertiary);text-decoration:none;letter-spacing:-.5px;}.logo span{color:var(--amber);}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;transition:color .2s;cursor:none;}.back-btn:hover{color:var(--amber-bright);}
+    .sub-nav{display:flex;gap:20px;}.sub-nav a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);text-decoration:none;transition:color .2s;cursor:none;}.sub-nav a:hover{color:var(--amber-bright);}.sub-nav a.active{color:var(--amber);}
+
+    .content{max-width:1080px;margin:0 auto;padding:72px 56px 120px;}
+
+    /* HERO */
+    .contact-hero{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:72px;animation:fadeUp .7s ease .1s both;}
+    .contact-headline{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(48px,6vw,88px);line-height:.95;letter-spacing:-3px;margin-bottom:20px;}
+    .contact-headline span{color:var(--amber);}
+    .contact-sub{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:28px;}
+    .contact-sub strong{color:var(--text);font-weight:500;}
+    .status-pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green-bright);}
+    .status-dot-g{width:6px;height:6px;border-radius:50%;background:var(--green-bright);animation:pulseg 2s infinite;}
+    @keyframes pulseg{0%,100%{box-shadow:0 0 0 0 rgba(106,175,126,.4)}50%{box-shadow:0 0 0 4px rgba(106,175,126,0)}}
+
+    /* CONTACT LINKS */
+    .contact-links{display:flex;flex-direction:column;gap:14px;}
+    .contact-link{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:22px 26px;background:var(--surface);border:1px solid var(--border);border-radius:16px;
+      text-decoration:none;transition:border-color .25s,transform .25s,background .25s;cursor:none;
+    }
+    .contact-link:hover{border-color:var(--border-bright);transform:translateX(6px);background:var(--surface2);}
+    .cl-left{display:flex;flex-direction:column;gap:4px;}
+    .cl-type{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-tertiary);}
+    .cl-val{font-size:16px;font-weight:500;color:var(--text);}
+    .cl-arrow{font-size:18px;color:var(--amber);transition:transform .2s;}
+    .contact-link:hover .cl-arrow{transform:translate(3px,-3px);}
+
+    /* DIVIDER */
+    .divider{border:none;border-top:1px solid var(--border);margin:56px 0;}
+
+    /* AVAILABILITY */
+    .avail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+    .avail-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center;transition:border-color .3s;}
+    .avail-card:hover{border-color:var(--border-bright);}
+    .avail-icon{font-size:24px;margin-bottom:10px;}
+    .avail-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+    .avail-text{font-size:13px;color:var(--text-secondary);line-height:1.5;}
+
+    .section-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+    .section-label::before{content:'';width:18px;height:1px;background:var(--amber);}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    .page-footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+    .footer-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-tertiary);letter-spacing:.08em;}
+    .t-overlay{position:fixed;inset:0;background:var(--black);z-index:9990;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .t-overlay.active{opacity:1;pointer-events:all;}
+
+    @media(max-width:768px){.content{padding:48px 24px 80px;}.page-header{padding:20px 24px;}.sub-nav{display:none;}.contact-hero{grid-template-columns:1fr;gap:40px;}.avail-grid{grid-template-columns:1fr;}.page-footer{padding:20px 24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="t-overlay" id="overlay"></div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" data-href="index.html">← Return to Room</a>
+  <a href="index.html" class="logo" data-href="index.html">A<span>.</span>A</a>
+  <nav class="sub-nav">
+    <a href="about.html" data-href="about.html">About</a>
+    <a href="experience.html" data-href="experience.html">Experience</a>
+    <a href="projects.html" data-href="projects.html">Projects</a>
+    <a href="skills.html" data-href="skills.html">Skills</a>
+    <a href="education.html" data-href="education.html">Education</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="contact-hero">
+    <div>
+      <div class="contact-headline">Let's<br>open a<br><span>line.</span></div>
+      <p class="contact-sub">I'm open to <strong>Summer 2026 internships</strong>, research collaborations, and conversations about robotics, embedded systems, and AI. Reach out — I respond promptly.</p>
+      <div class="status-pill"><div class="status-dot-g"></div>Available · Open to Internships</div>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:aryan15@illinois.edu" class="contact-link">
+        <div class="cl-left"><span class="cl-type">Email</span><span class="cl-val">aryan15@illinois.edu</span></div>
+        <span class="cl-arrow">↗</span>
+      </a>
+      <a href="https://www.linkedin.com/in/aryan-aryan-172203233/" target="_blank" class="contact-link">
+        <div class="cl-left"><span class="cl-type">LinkedIn</span><span class="cl-val">Aryan Aryan</span></div>
+        <span class="cl-arrow">↗</span>
+      </a>
+      <a href="https://github.com/" target="_blank" class="contact-link">
+        <div class="cl-left"><span class="cl-type">GitHub</span><span class="cl-val">Add your username →</span></div>
+        <span class="cl-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-label reveal">Open to opportunities in</div>
+  <div class="avail-grid reveal" style="transition-delay:.1s">
+    <div class="avail-card">
+      <div class="avail-icon">🔧</div>
+      <div class="avail-label">Engineering</div>
+      <div class="avail-text">Embedded systems, hardware, IoT, signal processing roles</div>
+    </div>
+    <div class="avail-card">
+      <div class="avail-icon">🧠</div>
+      <div class="avail-label">ML / AI</div>
+      <div class="avail-text">Computer vision, model training, robotics perception</div>
+    </div>
+    <div class="avail-card">
+      <div class="avail-icon">📱</div>
+      <div class="avail-label">Mobile / Software</div>
+      <div class="avail-text">iOS, Android, full-stack development roles</div>
+    </div>
+  </div>
+</main>
+
+<footer class="page-footer">
+  <span class="footer-text">// Open Channel · Aryan Aryan</span>
+  <span class="footer-text">© 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;});
+  (function loop(){rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.transform=`translate(${rx-14}px,${ry-14}px)`;requestAnimationFrame(loop);})();
+  document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='40px';ring.style.height='40px';});el.addEventListener('mouseleave',()=>{ring.style.width='28px';ring.style.height='28px';});});
+  const overlay=document.getElementById('overlay');
+  document.querySelectorAll('a[data-href]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();overlay.classList.add('active');setTimeout(()=>{window.location.href=el.getAttribute('data-href');},280);});});
+  const obs=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

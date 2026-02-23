@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Active Missions — Aryan Aryan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--black:#0c0a08;--surface:#141210;--surface2:#1c1916;--border:rgba(255,220,120,0.08);--border-bright:rgba(255,220,120,0.22);--text:#f0e8d8;--text-secondary:#9a8f7a;--text-tertiary:#4a4338;--amber:#d4920a;--amber-bright:#f5a623;--green-bright:#6aaf7e;--red:#c0392b;}
+    body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;min-height:100vh;}
+    .cursor{width:8px;height:8px;background:var(--amber-bright);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:screen;}
+    .cursor-ring{width:28px;height:28px;border:1px solid rgba(245,166,35,0.4);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .18s,height .18s;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:8000;opacity:.5;}
+    .page-header{padding:24px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(12,10,8,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;animation:fadeDown .5s ease both;}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text-tertiary);text-decoration:none;letter-spacing:-.5px;}
+    .logo span{color:var(--amber);}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;transition:color .2s;cursor:none;}
+    .back-btn:hover{color:var(--amber-bright);}
+    .sub-nav{display:flex;gap:20px;}
+    .sub-nav a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);text-decoration:none;transition:color .2s;cursor:none;}
+    .sub-nav a:hover{color:var(--amber-bright);}
+    .sub-nav a.active{color:var(--amber);}
+
+    .content{max-width:1080px;margin:0 auto;padding:72px 56px 120px;}
+    .page-header-block{margin-bottom:64px;animation:fadeUp .7s ease .1s both;}
+    .page-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'';width:18px;height:1px;background:var(--amber);}
+    .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-3px;}
+    .page-title .ghost{color:transparent;-webkit-text-stroke:1px rgba(240,232,216,.15);}
+    .page-subtitle{font-size:16px;color:var(--text-secondary);margin-top:20px;max-width:500px;line-height:1.6;}
+
+    /* PINBOARD GRID */
+    .pinboard{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+
+    .pin-card{
+      background:var(--surface);border:1px solid var(--border);border-radius:18px;
+      padding:36px;position:relative;overflow:hidden;
+      transition:border-color .3s,transform .3s,box-shadow .3s;
+    }
+    .pin-card:hover{border-color:var(--border-bright);transform:translateY(-5px);box-shadow:0 24px 64px rgba(0,0,0,.5);}
+
+    /* PIN DOT */
+    .pin{
+      position:absolute;top:20px;right:24px;
+      width:16px;height:16px;border-radius:50%;
+      background:var(--amber);
+      box-shadow:0 0 0 3px rgba(212,146,10,.2);
+    }
+    .pin::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;background:rgba(0,0,0,.4);border-radius:50%;}
+
+    .pin-status{
+      display:inline-flex;align-items:center;gap:6px;
+      font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+      margin-bottom:20px;
+    }
+    .pin-status-dot{width:6px;height:6px;border-radius:50%;}
+    .pin-status.active .pin-status-dot{background:var(--green-bright);animation:pulseg 2s infinite;}
+    .pin-status.active{color:var(--green-bright);}
+    .pin-status.complete .pin-status-dot{background:var(--amber);}
+    .pin-status.complete{color:var(--amber);}
+    @keyframes pulseg{0%,100%{box-shadow:0 0 0 0 rgba(106,175,126,.4)}50%{box-shadow:0 0 0 4px rgba(106,175,126,0)}}
+
+    .pin-title{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.5px;margin-bottom:8px;line-height:1.2;}
+    .pin-org{font-family:'DM Mono',monospace;font-size:11px;color:var(--amber);margin-bottom:16px;letter-spacing:.04em;}
+    .pin-desc{font-size:14px;line-height:1.75;color:var(--text-secondary);margin-bottom:20px;}
+    .pin-desc strong{color:var(--text);font-weight:500;}
+    .pin-tags{display:flex;flex-wrap:wrap;gap:8px;}
+    .pin-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);background:rgba(255,255,255,.03);border:1px solid var(--border);padding:4px 12px;border-radius:12px;}
+
+    /* WIDE CARD */
+    .pin-card.wide{grid-column:span 2;}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    .page-footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+    .footer-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-tertiary);letter-spacing:.08em;}
+    .t-overlay{position:fixed;inset:0;background:var(--black);z-index:9990;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .t-overlay.active{opacity:1;pointer-events:all;}
+
+    @media(max-width:768px){.content{padding:48px 24px 80px;}.page-header{padding:20px 24px;}.sub-nav{display:none;}.pinboard{grid-template-columns:1fr;}.pin-card.wide{grid-column:span 1;}.page-footer{padding:20px 24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="t-overlay" id="overlay"></div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" data-href="index.html">← Return to Room</a>
+  <a href="index.html" class="logo" data-href="index.html">A<span>.</span>A</a>
+  <nav class="sub-nav">
+    <a href="about.html" data-href="about.html">About</a>
+    <a href="experience.html" data-href="experience.html">Experience</a>
+    <a href="projects.html" class="active">Projects</a>
+    <a href="skills.html" data-href="skills.html">Skills</a>
+    <a href="education.html" data-href="education.html">Education</a>
+    <a href="contact.html" data-href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="page-header-block">
+    <div class="page-eyebrow">Mission Board</div>
+    <h1 class="page-title">Active<br><span class="ghost">Missions</span></h1>
+    <p class="page-subtitle">Projects across embedded systems, computer vision, mobile, and AI-driven analytics.</p>
+  </div>
+
+  <div class="pinboard">
+
+    <div class="pin-card reveal">
+      <div class="pin"></div>
+      <div class="pin-status active"><div class="pin-status-dot"></div>Active</div>
+      <div class="pin-title">YOLO11 Autonomous Perception</div>
+      <div class="pin-org">Illini EV Concept · UIUC</div>
+      <div class="pin-desc">Custom object detection pipeline using <strong>Ultralytics YOLO11</strong> for UIUC's autonomous electric vehicle. Trained on diverse road datasets to achieve real-time detection accuracy for pedestrian and obstacle recognition.</div>
+      <div class="pin-tags"><span class="pin-tag">YOLO11</span><span class="pin-tag">Python</span><span class="pin-tag">OpenCV</span><span class="pin-tag">Computer Vision</span></div>
+    </div>
+
+    <div class="pin-card reveal" style="transition-delay:.1s">
+      <div class="pin"></div>
+      <div class="pin-status complete"><div class="pin-status-dot"></div>Complete · 🏆 Award</div>
+      <div class="pin-title">Warehouse Intelligence System</div>
+      <div class="pin-org">URSA Research · John Deere Data</div>
+      <div class="pin-desc">End-to-end analytics pipeline on John Deere logistics data — <strong>3,204 SKUs</strong>, 3,084 KPI alerts, 96.3% coverage. Integrated Node-RED automated replenishment workflow cutting decision time by <strong>~40%</strong>. Awarded Best Presentation at Fall 2025 URS.</div>
+      <div class="pin-tags"><span class="pin-tag">Python</span><span class="pin-tag">Node-RED</span><span class="pin-tag">AI/ML</span><span class="pin-tag">Analytics</span></div>
+    </div>
+
+    <div class="pin-card reveal" style="transition-delay:.2s">
+      <div class="pin"></div>
+      <div class="pin-status complete"><div class="pin-status-dot"></div>Complete</div>
+      <div class="pin-title">Arduino Edge Monitoring System</div>
+      <div class="pin-org">URSA Research · Embedded Hardware</div>
+      <div class="pin-desc">Edge monitoring system integrating <strong>load cells and ultrasonic sensors</strong> with signal conditioning and impedance-matching techniques. Reduced sensor variance by <strong>10–15%</strong>, enabling real-time shelf-level stock classification with on-device LED analytics.</div>
+      <div class="pin-tags"><span class="pin-tag">Arduino</span><span class="pin-tag">Embedded C</span><span class="pin-tag">Signal Processing</span><span class="pin-tag">IoT</span></div>
+    </div>
+
+    <div class="pin-card reveal" style="transition-delay:.3s">
+      <div class="pin"></div>
+      <div class="pin-status complete"><div class="pin-status-dot"></div>Complete · 100+ Sales</div>
+      <div class="pin-title">CineScope — iOS Movie Browser</div>
+      <div class="pin-org">CodeSpeedy Internship · iOS</div>
+      <div class="pin-desc">Full-featured movie browsing app built in <strong>Swift UI</strong> integrated with TMDB and REST APIs. Grid layout displaying <strong>1,000+ movies</strong> with instant search, dark/light mode toggle, placeholder handling, and SF Symbols fallback. Achieved 100+ App Store sales.</div>
+      <div class="pin-tags"><span class="pin-tag">Swift UI</span><span class="pin-tag">Xcode</span><span class="pin-tag">TMDB API</span><span class="pin-tag">REST</span></div>
+    </div>
+
+    <div class="pin-card wide reveal" style="transition-delay:.4s">
+      <div class="pin"></div>
+      <div class="pin-status complete"><div class="pin-status-dot"></div>Complete · 40% Growth</div>
+      <div class="pin-title">VisitMind Platform — API & Android Optimization</div>
+      <div class="pin-org">VisitMind · San Francisco</div>
+      <div class="pin-desc">Implemented <strong>Amazon SES</strong> API mailing system driving a 40% increase in service requests. Refactored Android codebase collaborating with DevOps — eliminated memory leaks, reduced load times, and scaled active users from <strong>127 to 273</strong> in 3 months. Also contributed to investor pitch strategy and business model review.</div>
+      <div class="pin-tags"><span class="pin-tag">Android Studio</span><span class="pin-tag">AWS SES</span><span class="pin-tag">Java</span><span class="pin-tag">DevOps</span><span class="pin-tag">Business Strategy</span></div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="page-footer">
+  <span class="footer-text">// Mission Board · Aryan Aryan</span>
+  <span class="footer-text">© 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;});
+  (function loop(){rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.transform=`translate(${rx-14}px,${ry-14}px)`;requestAnimationFrame(loop);})();
+  document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='40px';ring.style.height='40px';});el.addEventListener('mouseleave',()=>{ring.style.width='28px';ring.style.height='28px';});});
+  const overlay=document.getElementById('overlay');
+  document.querySelectorAll('a[data-href]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();overlay.classList.add('active');setTimeout(()=>{window.location.href=el.getAttribute('data-href');},280);});});
+  const obs=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

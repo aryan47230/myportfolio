@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Terminal — Aryan Aryan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--black:#0c0a08;--surface:#141210;--surface2:#1c1916;--border:rgba(255,220,120,0.08);--border-bright:rgba(255,220,120,0.22);--text:#f0e8d8;--text-secondary:#9a8f7a;--text-tertiary:#4a4338;--amber:#d4920a;--amber-bright:#f5a623;--green-bright:#6aaf7e;}
+    body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;min-height:100vh;}
+    .cursor{width:8px;height:8px;background:var(--amber-bright);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:screen;}
+    .cursor-ring{width:28px;height:28px;border:1px solid rgba(245,166,35,0.4);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .18s,height .18s;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:8000;opacity:.5;}
+    .page-header{padding:24px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(12,10,8,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;animation:fadeDown .5s ease both;}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text-tertiary);text-decoration:none;letter-spacing:-.5px;}.logo span{color:var(--amber);}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;transition:color .2s;cursor:none;}.back-btn:hover{color:var(--amber-bright);}
+    .sub-nav{display:flex;gap:20px;}.sub-nav a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);text-decoration:none;transition:color .2s;cursor:none;}.sub-nav a:hover{color:var(--amber-bright);}.sub-nav a.active{color:var(--amber);}
+
+    .content{max-width:1080px;margin:0 auto;padding:72px 56px 120px;}
+    .page-header-block{margin-bottom:56px;animation:fadeUp .7s ease .1s both;}
+    .page-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'';width:18px;height:1px;background:var(--amber);}
+    .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-3px;}
+    .page-title .ghost{color:transparent;-webkit-text-stroke:1px rgba(240,232,216,.15);}
+
+    /* TERMINAL WINDOW */
+    .terminal{
+      background:#0a0e0a;border:1px solid rgba(106,175,126,0.2);
+      border-radius:16px;overflow:hidden;margin-bottom:48px;
+      animation:fadeUp .7s ease .3s both;
+      box-shadow:0 0 60px rgba(106,175,126,0.05);
+    }
+    .terminal-bar{
+      background:#111510;border-bottom:1px solid rgba(106,175,126,0.1);
+      padding:12px 18px;display:flex;align-items:center;gap:8px;
+    }
+    .tb{width:10px;height:10px;border-radius:50%;}
+    .tb.r{background:#c0392b;}.tb.y{background:#d4920a;}.tb.g{background:#6aaf7e;}
+    .terminal-title{font-family:'DM Mono',monospace;font-size:11px;color:rgba(106,175,126,0.4);margin-left:8px;letter-spacing:.06em;}
+    .terminal-body{padding:28px 32px;font-family:'DM Mono',monospace;font-size:13px;line-height:2;}
+    .tl-cmd{color:rgba(106,175,126,0.5);}
+    .tl-cmd span{color:var(--green-bright);}
+    .tl-out{color:rgba(240,232,216,0.6);padding-left:16px;}
+    .tl-out strong{color:var(--amber-bright);}
+    .cursor-blink{display:inline-block;width:8px;height:14px;background:var(--green-bright);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    /* SKILLS GRID */
+    .skills-outer{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .skill-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .3s;}
+    .skill-section:hover{border-color:var(--border-bright);}
+    .skill-section-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+    .skill-section-title::before{content:'//';opacity:.5;}
+    .skill-rows{display:flex;flex-direction:column;gap:12px;}
+    .skill-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .skill-name{font-size:13px;color:var(--text);min-width:120px;}
+    .skill-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+    .skill-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--amber),var(--amber-bright));width:0;transition:width 1s ease;}
+    .skill-level{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-tertiary);min-width:36px;text-align:right;}
+
+    /* SOFT SKILLS */
+    .soft-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;}
+    .soft-tag{font-size:13px;color:var(--text-secondary);background:var(--surface);border:1px solid var(--border);padding:8px 18px;border-radius:24px;transition:border-color .2s,color .2s;}
+    .soft-tag:hover{border-color:var(--border-bright);color:var(--text);}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    .page-footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+    .footer-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-tertiary);letter-spacing:.08em;}
+    .t-overlay{position:fixed;inset:0;background:var(--black);z-index:9990;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .t-overlay.active{opacity:1;pointer-events:all;}
+
+    @media(max-width:768px){.content{padding:48px 24px 80px;}.page-header{padding:20px 24px;}.sub-nav{display:none;}.skills-outer{grid-template-columns:1fr;}.page-footer{padding:20px 24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="t-overlay" id="overlay"></div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" data-href="index.html">← Return to Room</a>
+  <a href="index.html" class="logo" data-href="index.html">A<span>.</span>A</a>
+  <nav class="sub-nav">
+    <a href="about.html" data-href="about.html">About</a>
+    <a href="experience.html" data-href="experience.html">Experience</a>
+    <a href="projects.html" data-href="projects.html">Projects</a>
+    <a href="skills.html" class="active">Skills</a>
+    <a href="education.html" data-href="education.html">Education</a>
+    <a href="contact.html" data-href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="page-header-block">
+    <div class="page-eyebrow">System Access</div>
+    <h1 class="page-title">The<br><span class="ghost">Terminal</span></h1>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="tb r"></div><div class="tb y"></div><div class="tb g"></div>
+      <span class="terminal-title">aryan@uiuc ~ skills.sh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="tl-cmd">$ <span>load_profile</span> --subject="Aryan Aryan"</div>
+      <div class="tl-out">→ Profile loaded. <strong>EE+CS · UIUC · Class of 2028</strong></div>
+      <div class="tl-cmd">$ <span>list_skills</span> --verbose</div>
+      <div class="tl-out">→ Languages: <strong>Python, C++, Swift, Java, JavaScript, SQL</strong></div>
+      <div class="tl-out">→ ML/AI: <strong>YOLO11, TensorFlow, OpenCV, Pandas, NumPy</strong></div>
+      <div class="tl-out">→ Embedded: <strong>Arduino, Node-RED, Signal Conditioning</strong></div>
+      <div class="tl-out">→ Cloud/Mobile: <strong>AWS SES, Android Studio, Xcode, REST APIs</strong></div>
+      <div class="tl-out">→ Status: <strong style="color:var(--green-bright)">OPERATIONAL</strong> <div class="cursor-blink"></div></div>
+    </div>
+  </div>
+
+  <div class="skills-outer reveal">
+    <div class="skill-section">
+      <div class="skill-section-title">Languages</div>
+      <div class="skill-rows">
+        <div class="skill-row"><span class="skill-name">Python</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="90"></div></div><span class="skill-level">90%</span></div>
+        <div class="skill-row"><span class="skill-name">C++</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="75"></div></div><span class="skill-level">75%</span></div>
+        <div class="skill-row"><span class="skill-name">Swift / SwiftUI</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div><span class="skill-level">80%</span></div>
+        <div class="skill-row"><span class="skill-name">Java</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="75"></div></div><span class="skill-level">75%</span></div>
+        <div class="skill-row"><span class="skill-name">JavaScript</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="65"></div></div><span class="skill-level">65%</span></div>
+        <div class="skill-row"><span class="skill-name">SQL</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="70"></div></div><span class="skill-level">70%</span></div>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">ML / AI</div>
+      <div class="skill-rows">
+        <div class="skill-row"><span class="skill-name">Ultralytics YOLO</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="85"></div></div><span class="skill-level">85%</span></div>
+        <div class="skill-row"><span class="skill-name">OpenCV</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div><span class="skill-level">80%</span></div>
+        <div class="skill-row"><span class="skill-name">TensorFlow</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="65"></div></div><span class="skill-level">65%</span></div>
+        <div class="skill-row"><span class="skill-name">Pandas / NumPy</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="85"></div></div><span class="skill-level">85%</span></div>
+        <div class="skill-row"><span class="skill-name">Data Analytics</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div><span class="skill-level">80%</span></div>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">Embedded / Hardware</div>
+      <div class="skill-rows">
+        <div class="skill-row"><span class="skill-name">Arduino / Embedded C</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div><span class="skill-level">80%</span></div>
+        <div class="skill-row"><span class="skill-name">Node-RED</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="75"></div></div><span class="skill-level">75%</span></div>
+        <div class="skill-row"><span class="skill-name">Signal Conditioning</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="70"></div></div><span class="skill-level">70%</span></div>
+        <div class="skill-row"><span class="skill-name">Sensor Integration</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="78"></div></div><span class="skill-level">78%</span></div>
+        <div class="skill-row"><span class="skill-name">Circuit Design</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="72"></div></div><span class="skill-level">72%</span></div>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">Cloud / Mobile / Tools</div>
+      <div class="skill-rows">
+        <div class="skill-row"><span class="skill-name">AWS (SES)</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="70"></div></div><span class="skill-level">70%</span></div>
+        <div class="skill-row"><span class="skill-name">Android Studio</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="78"></div></div><span class="skill-level">78%</span></div>
+        <div class="skill-row"><span class="skill-name">Xcode / iOS</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div><span class="skill-level">80%</span></div>
+        <div class="skill-row"><span class="skill-name">Git / GitHub</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="85"></div></div><span class="skill-level">85%</span></div>
+        <div class="skill-row"><span class="skill-name">REST APIs</span><div class="skill-bar-wrap"><div class="skill-bar" data-w="82"></div></div><span class="skill-level">82%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="soft-grid reveal" style="transition-delay:.2s">
+    <span class="soft-tag">Cross-cultural Communication</span>
+    <span class="soft-tag">Technical Leadership</span>
+    <span class="soft-tag">Research & Rapid Prototyping</span>
+    <span class="soft-tag">Team Collaboration</span>
+    <span class="soft-tag">Public Speaking & Presentation</span>
+    <span class="soft-tag">Agile / Iterative Development</span>
+  </div>
+</main>
+
+<footer class="page-footer">
+  <span class="footer-text">// System Access · Aryan Aryan</span>
+  <span class="footer-text">© 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;});
+  (function loop(){rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.transform=`translate(${rx-14}px,${ry-14}px)`;requestAnimationFrame(loop);})();
+  document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='40px';ring.style.height='40px';});el.addEventListener('mouseleave',()=>{ring.style.width='28px';ring.style.height='28px';});});
+  const overlay=document.getElementById('overlay');
+  document.querySelectorAll('a[data-href]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();overlay.classList.add('active');setTimeout(()=>{window.location.href=el.getAttribute('data-href');},280);});});
+  // Skill bars animate on reveal
+  const obs=new IntersectionObserver(entries=>entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>{
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('.skill-bar').forEach((bar,j)=>{
+          setTimeout(()=>{ bar.style.width=bar.dataset.w+'%'; },j*60+200);
+        });
+      },i*100);
+      obs.unobserve(e.target);
+    }
+  }),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

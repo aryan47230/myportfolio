@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Credentials — Aryan Aryan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--black:#0c0a08;--surface:#141210;--surface2:#1c1916;--border:rgba(255,220,120,0.08);--border-bright:rgba(255,220,120,0.22);--text:#f0e8d8;--text-secondary:#9a8f7a;--text-tertiary:#4a4338;--amber:#d4920a;--amber-bright:#f5a623;--green-bright:#6aaf7e;}
+    body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;min-height:100vh;}
+    .cursor{width:8px;height:8px;background:var(--amber-bright);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:screen;}
+    .cursor-ring{width:28px;height:28px;border:1px solid rgba(245,166,35,0.4);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .18s,height .18s;}
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:8000;opacity:.5;}
+    .page-header{padding:24px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(12,10,8,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;animation:fadeDown .5s ease both;}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text-tertiary);text-decoration:none;letter-spacing:-.5px;}.logo span{color:var(--amber);}
+    .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;transition:color .2s;cursor:none;}.back-btn:hover{color:var(--amber-bright);}
+    .sub-nav{display:flex;gap:20px;}.sub-nav a{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);text-decoration:none;transition:color .2s;cursor:none;}.sub-nav a:hover{color:var(--amber-bright);}.sub-nav a.active{color:var(--amber);}
+
+    .content{max-width:1080px;margin:0 auto;padding:72px 56px 120px;}
+    .page-header-block{margin-bottom:64px;animation:fadeUp .7s ease .1s both;}
+    .page-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'';width:18px;height:1px;background:var(--amber);}
+    .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-3px;}
+    .page-title .ghost{color:transparent;-webkit-text-stroke:1px rgba(240,232,216,.15);}
+
+    /* EDU CARDS */
+    .edu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:48px;}
+
+    .edu-card{
+      background:var(--surface);border:1px solid var(--border);border-radius:20px;
+      padding:44px;position:relative;overflow:hidden;
+      transition:border-color .3s,transform .3s;
+    }
+    .edu-card:hover{border-color:var(--border-bright);transform:translateY(-4px);}
+    .edu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--amber),transparent);}
+
+    .edu-icon{font-size:32px;margin-bottom:24px;filter:saturate(0.6);}
+    .edu-degree{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.5px;line-height:1.2;margin-bottom:10px;}
+    .edu-school{font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);margin-bottom:6px;letter-spacing:.04em;}
+    .edu-year{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-tertiary);margin-bottom:20px;}
+    .edu-detail{font-size:13px;color:var(--text-secondary);line-height:1.65;}
+    .edu-detail strong{color:var(--text);font-weight:500;}
+    .edu-activities{margin-top:16px;}
+    .edu-act-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px;}
+    .act-tags{display:flex;flex-wrap:wrap;gap:8px;}
+    .act-tag{font-size:12px;color:var(--text-secondary);background:rgba(255,255,255,.03);border:1px solid var(--border);padding:4px 12px;border-radius:12px;}
+
+    /* LEADERSHIP */
+    .section-divider{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+    .section-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    .lead-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+    .lead-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .3s,transform .3s;}
+    .lead-card:hover{border-color:var(--border-bright);transform:translateY(-3px);}
+    .lead-icon{font-size:22px;margin-bottom:12px;}
+    .lead-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+    .lead-org{font-family:'DM Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:.06em;}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    .page-footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+    .footer-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-tertiary);letter-spacing:.08em;}
+    .t-overlay{position:fixed;inset:0;background:var(--black);z-index:9990;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .t-overlay.active{opacity:1;pointer-events:all;}
+
+    @media(max-width:768px){.content{padding:48px 24px 80px;}.page-header{padding:20px 24px;}.sub-nav{display:none;}.edu-grid,.lead-grid{grid-template-columns:1fr;}.page-footer{padding:20px 24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="t-overlay" id="overlay"></div>
+
+<header class="page-header">
+  <a href="index.html" class="back-btn" data-href="index.html">← Return to Room</a>
+  <a href="index.html" class="logo" data-href="index.html">A<span>.</span>A</a>
+  <nav class="sub-nav">
+    <a href="about.html" data-href="about.html">About</a>
+    <a href="experience.html" data-href="experience.html">Experience</a>
+    <a href="projects.html" data-href="projects.html">Projects</a>
+    <a href="skills.html" data-href="skills.html">Skills</a>
+    <a href="education.html" class="active">Education</a>
+    <a href="contact.html" data-href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="page-header-block">
+    <div class="page-eyebrow">Credentials</div>
+    <h1 class="page-title">The<br><span class="ghost">Wall</span></h1>
+  </div>
+
+  <div class="edu-grid reveal">
+    <div class="edu-card">
+      <div class="edu-icon">🎓</div>
+      <div class="edu-degree">BS Electrical & Electronics Engineering</div>
+      <div class="edu-school">University of Illinois Urbana-Champaign</div>
+      <div class="edu-year">Aug 2024 – May 2028</div>
+      <div class="edu-detail"><strong>Minor in Computer Science</strong> · Siebel School of Computing & Data Science. One of the top-ranked ECE and CS programs in the United States.</div>
+      <div class="edu-activities">
+        <div class="edu-act-label">// Activities</div>
+        <div class="act-tags">
+          <span class="act-tag">EV Concept Autonomous Team</span>
+          <span class="act-tag">Illinois Business Consulting</span>
+          <span class="act-tag">IEEE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-icon">🏫</div>
+      <div class="edu-degree">AP Diploma Program</div>
+      <div class="edu-school">Jakarta Intercultural School</div>
+      <div class="edu-year">Graduated 2024 · Jakarta, Indonesia</div>
+      <div class="edu-detail">High School Diploma with Advanced Placement curriculum. Lived in Jakarta for <strong>8+ years</strong> before moving to the US — gained exposure to diverse cultures, languages, and international education standards.</div>
+      <div class="edu-activities">
+        <div class="edu-act-label">// Activities</div>
+        <div class="act-tags">
+          <span class="act-tag">Code Club (President)</span>
+          <span class="act-tag">VEX Robotics (Founder)</span>
+          <span class="act-tag">Engineering Off-Grid</span>
+          <span class="act-tag">Varsity Rugby</span>
+          <span class="act-tag">Film Society</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider reveal" style="transition-delay:.15s">Leadership & Extra-Curricular</div>
+
+  <div class="lead-grid reveal" style="transition-delay:.2s">
+    <div class="lead-card">
+      <div class="lead-icon">📚</div>
+      <div class="lead-title">Course Lead</div>
+      <div class="lead-org">CS124H · UIUC · 2025–Present</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-icon">🚗</div>
+      <div class="lead-title">ML Engineer</div>
+      <div class="lead-org">Illini EV Concept · Autonomous Team</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-icon">🏆</div>
+      <div class="lead-title">Best Presentation</div>
+      <div class="lead-org">Fall 2025 URS · UIUC</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-icon">💻</div>
+      <div class="lead-title">Code Club President</div>
+      <div class="lead-org">Jakarta Intercultural School</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-icon">🤖</div>
+      <div class="lead-title">VEX Robotics Founder</div>
+      <div class="lead-org">Jakarta Intercultural School</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-icon">🌏</div>
+      <div class="lead-title">Global Background</div>
+      <div class="lead-org">India · Indonesia · UAE · USA</div>
+    </div>
+  </div>
+</main>
+
+<footer class="page-footer">
+  <span class="footer-text">// Credentials · Aryan Aryan</span>
+  <span class="footer-text">© 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;});
+  (function loop(){rx+=(mx-rx)*.14;ry+=(my-ry)*.14;ring.style.transform=`translate(${rx-14}px,${ry-14}px)`;requestAnimationFrame(loop);})();
+  document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='40px';ring.style.height='40px';});el.addEventListener('mouseleave',()=>{ring.style.width='28px';ring.style.height='28px';});});
+  const overlay=document.getElementById('overlay');
+  document.querySelectorAll('a[data-href]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();overlay.classList.add('active');setTimeout(()=>{window.location.href=el.getAttribute('data-href');},280);});});
+  const obs=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
